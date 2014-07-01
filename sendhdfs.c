@@ -5,14 +5,23 @@
 #include <errno.h>
 #include <libgen.h>
 #include <unistd.h>
+#include <stdbool.h>
 
 #define MAXLENGTH 1024
+#define MAXCOUNT 1024
+
+/*
+ * TODO:
+ * 1. add filename template , for example: /xxxxx/category_name/%Y-%M-%D/%ip.log  etc
+ * 2. retry for connect and openfile/writefile etc
+ * 3. read configuration from commandline param
+ */
 
 static char*
-loopBufReading( size_t count) {
+loopBufReading( char *rbuf,size_t count) {
     size_t rlen;
-    char *rbuf,*tmpbuf;
-    rbuf = (char *)malloc(MAXLENGTH * count);
+    char *tmpbuf;
+    
     tmpbuf = rbuf;
     for (; count--; count >= 0) {
         tmpbuf = gets(tmpbuf);
@@ -73,8 +82,8 @@ int HDFSdoWriteFile(hdfsFS fs, hdfsFile fh, int len) {
     return 1;
 }
 
-static inline
-int doFlushAndClose(hdfsFS fs, hdfsFile fh) {
+static inline int 
+doFlushAndClose(hdfsFS fs, hdfsFile fh) {
     int re;
     re = hdfsFlush(fs, fh);
     printf("hdfsFlush return %d \t %s \n", errno, strerror(errno));
@@ -88,13 +97,21 @@ int doFlushAndClose(hdfsFS fs, hdfsFile fh) {
     return re;
 }
 
+static int
+getParam(){
+
+}
+
 int main(int argc, char *argv[]) {
 
     char * filename = argv[1];
+    int count = argv[2];
+    
+    if(count > MAXCOUNT)
+        count = MAXCOUNT;
+    
     printf("get filename %s\n", filename);
-
-    //const char* writePath = "/rsyslog_test/testchunsheng.rsyslog.v8.log";
-    //const char* path = "/rsyslog_test/bbbbccc/dddd";
+    printf("get count %d",count);
 
     char *file_t = strdup(filename);
     printf("file_t %s\n", file_t);
@@ -102,6 +119,10 @@ int main(int argc, char *argv[]) {
 
     printf("dirname %s \nfilename %s\n", path, filename);
 
+    char * rbuf = (char *)malloc(MAXLENGTH * count);
+    
+    rbuf = loopBufReading(rbuf,count);
+    
     hdfsFS fs = hdfsConnectAsUser("nn1.test.dip.sina.com.cn", 8020, "hadoop");
 
     int re;
