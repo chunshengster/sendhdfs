@@ -121,9 +121,11 @@ int main(int argc, char *argv[]) {
 
     char * rbuf = (char *)malloc(MAXLENGTH * count);
     
-    rbuf = loopBufReading(rbuf,count);
-    
     hdfsFS fs = hdfsConnectAsUser("nn1.test.dip.sina.com.cn", 8020, "hadoop");
+
+if(fs == NULL){
+     
+}
 
     int re;
     re = HDFSFileExists(fs, path);
