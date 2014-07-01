@@ -40,7 +40,7 @@ HDFSFileExists(hdfsFS fs, char *name) {
     }
 }
 
-hdfsFile openFile(hdfsFS fs, char * filename, int re) {
+hdfsFile HDFSopenFile(hdfsFS fs, char * filename, int re) {
     hdfsFile writeFile;
     if (re == 1) {
         printf(" re == 1 ,and append \n");
@@ -61,7 +61,7 @@ hdfsFile openFile(hdfsFS fs, char * filename, int re) {
 }
 
 static inline
-int doWriteFile(hdfsFS fs, hdfsFile fh, int len) {
+int HDFSdoWriteFile(hdfsFS fs, hdfsFile fh, int len) {
     char* buffer[] = {"Hello, World!\n", "fjdsljfsljf\n", "jflsjflsjflsjflsjf", "ssssssssss\n", "ddddddddddddd\n", "fjdlldfjlsj", "fjldsjfljsl\n", "fjdlsjflsj\n", "fjsljflsjfl\n"};
     char * p;
     for (int tmp = 0; tmp < 9; tmp++) {
@@ -112,13 +112,13 @@ int main(int argc, char *argv[]) {
     printf("HDFSFILEExists return %d \t %s \n", errno, strerror(errno));
     free(file_t);
 
-    hdfsFile fh = openFile(fs, filename, re);
+    hdfsFile fh = HDFSopenFile(fs, filename, re);
     if (fh == NULL) {
         printf("error open return");
         exit(-1);
     }
 
-    int len = doWriteFile(fs, fh, 0);
+    int len = HDFSdoWriteFile(fs, fh, 0);
     doFlushAndClose(fs, fh);
 
     hdfsDisconnect(fs);
